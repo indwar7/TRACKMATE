@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:trackmate_app/controllers/profile_controller.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 60,
-                      backgroundColor: const Color(0xFF8B5CF6).withOpacity(0.2),
+                      backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                       backgroundImage: controller.profileImage.value.isNotEmpty
                           ? NetworkImage(controller.profileImage.value)
                           : null,
@@ -218,7 +218,7 @@ class ProfileScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF8B5CF6).withOpacity(0.2),
+              color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:get_storage/get_storage.dart';
 import '../services/api_service.dart';
 import 'package:trackmate_app/widgets/edit_trip_dialog.dart';
 
@@ -33,30 +34,59 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   Future<void> _loadHistory() async {
     setState(() => _isLoading = true);
 
+    // 1. Load local trips from GetStorage
+    final box = GetStorage();
+    final List localRaw = box.read<List>('local_trips') ?? [];
+    final List<Map<String, dynamic>> localTrips =
+        localRaw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+
+    // 2. Try loading from API (silent on failure, 5s timeout)
+    List<Map<String, dynamic>> apiTrips = [];
     try {
       final api = context.read<ApiService>();
-      final res = await http.get(
-        Uri.parse("${ApiService.baseUrl}/trips/history/"),
-        headers: api.headers,
-      );
+      final res = await http
+          .get(
+            Uri.parse("${ApiService.baseUrl}/trips/history/"),
+            headers: api.headers,
+          )
+          .timeout(const Duration(seconds: 5));
 
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
-
         if (data is List) {
-          _trips = List<Map<String, dynamic>>.from(data);
+          apiTrips = List<Map<String, dynamic>>.from(data);
         } else if (data is Map && data["trips"] is List) {
-          _trips = List<Map<String, dynamic>>.from(data["trips"]);
+          apiTrips = List<Map<String, dynamic>>.from(data["trips"]);
         }
-      } else {
-        throw Exception("Failed to load trip history");
       }
     } catch (e) {
-      debugPrint("ERROR: $e");
-      _showError("Unable to load trip history");
+      debugPrint("Trip history API error (using local only): $e");
     }
 
-    setState(() => _isLoading = false);
+    // 3. Merge: local trips first, skip API duplicates already in local
+    final seenTripIds = <int>{};
+    for (final t in localTrips) {
+      final tid = t['trip_id'];
+      if (tid != null && tid is int && tid > 0) seenTripIds.add(tid);
+    }
+
+    for (final t in apiTrips) {
+      final tid = t['id'];
+      if (tid != null && tid is int && seenTripIds.contains(tid)) continue;
+      localTrips.add(t);
+    }
+
+    // 4. Sort newest first
+    localTrips.sort((a, b) {
+      final da = DateTime.tryParse(a['start_time'] ?? '') ?? DateTime(2000);
+      final db = DateTime.tryParse(b['start_time'] ?? '') ?? DateTime(2000);
+      return db.compareTo(da);
+    });
+
+    setState(() {
+      _trips = localTrips;
+      _isLoading = false;
+    });
   }
 
   // ------------------------------------------------------------------
@@ -184,7 +214,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                 fontWeight: FontWeight.bold)),
         Text(label,
             style:
-            TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
+            TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12)),
       ],
     );
   }
@@ -197,7 +227,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
       child: Text(
         "No trips found",
         style:
-        TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 18),
+        TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 18),
       ),
     );
   }
@@ -240,27 +270,28 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                     ],
                   ),
                 ),
-                // Edit Button
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Color(0xFF00adb5)),
-                  onPressed: () {
-                    showEditTripDialog(
-                      context: context,
-                      tripId: t['id'],
-                      currentFuelExpense: t['fuel_expense'] != null
-                          ? double.tryParse(t['fuel_expense'].toString())
-                          : null,
-                      currentParkingCost: t['parking_cost'] != null
-                          ? double.tryParse(t['parking_cost'].toString())
-                          : null,
-                      currentTollCost: t['toll_cost'] != null
-                          ? double.tryParse(t['toll_cost'].toString())
-                          : null,
-                      onSuccess: _loadHistory,
-                    );
-                  },
-                  tooltip: 'Edit Expenses',
-                ),
+                // Edit Button (only for backend trips)
+                if (t['source'] != 'local' && t['id'] != null)
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Color(0xFF00adb5)),
+                    onPressed: () {
+                      showEditTripDialog(
+                        context: context,
+                        tripId: t['id'] as int,
+                        currentFuelExpense: t['fuel_expense'] != null
+                            ? double.tryParse(t['fuel_expense'].toString())
+                            : null,
+                        currentParkingCost: t['parking_cost'] != null
+                            ? double.tryParse(t['parking_cost'].toString())
+                            : null,
+                        currentTollCost: t['toll_cost'] != null
+                            ? double.tryParse(t['toll_cost'].toString())
+                            : null,
+                        onSuccess: _loadHistory,
+                      );
+                    },
+                    tooltip: 'Edit Expenses',
+                  ),
               ],
             ),
 
@@ -291,10 +322,10 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00adb5).withOpacity(0.1),
+                  color: const Color(0xFF00adb5).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: const Color(0xFF00adb5).withOpacity(0.3),
+                    color: const Color(0xFF00adb5).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Column(
@@ -424,26 +455,27 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                             color: Colors.white,
                             fontSize: 22,
                             fontWeight: FontWeight.bold)),
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Color(0xFF00adb5)),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        showEditTripDialog(
-                          context: context,
-                          tripId: trip['id'],
-                          currentFuelExpense: trip['fuel_expense'] != null
-                              ? double.tryParse(trip['fuel_expense'].toString())
-                              : null,
-                          currentParkingCost: trip['parking_cost'] != null
-                              ? double.tryParse(trip['parking_cost'].toString())
-                              : null,
-                          currentTollCost: trip['toll_cost'] != null
-                              ? double.tryParse(trip['toll_cost'].toString())
-                              : null,
-                          onSuccess: _loadHistory,
-                        );
-                      },
-                    ),
+                    if (trip['source'] != 'local' && trip['id'] != null)
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Color(0xFF00adb5)),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          showEditTripDialog(
+                            context: context,
+                            tripId: trip['id'] as int,
+                            currentFuelExpense: trip['fuel_expense'] != null
+                                ? double.tryParse(trip['fuel_expense'].toString())
+                                : null,
+                            currentParkingCost: trip['parking_cost'] != null
+                                ? double.tryParse(trip['parking_cost'].toString())
+                                : null,
+                            currentTollCost: trip['toll_cost'] != null
+                                ? double.tryParse(trip['toll_cost'].toString())
+                                : null,
+                            onSuccess: _loadHistory,
+                          );
+                        },
+                      ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -643,20 +675,9 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
       onSelected: (_) {
         setSheet(() => _filterMode = value);
       },
-      selectedColor: Colors.teal.withOpacity(0.3),
+      selectedColor: Colors.teal.withValues(alpha: 0.3),
       checkmarkColor: Colors.tealAccent,
     );
   }
 
-  // ------------------------------------------------------------------
-  // ERROR / SUCCESS SNACKBAR
-  // ------------------------------------------------------------------
-  void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
 }

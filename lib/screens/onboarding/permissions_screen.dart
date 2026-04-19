@@ -4,7 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LocationPermissionScreen extends StatefulWidget {
-  const LocationPermissionScreen({Key? key}) : super(key: key);
+  const LocationPermissionScreen({super.key});
 
   @override
   State<LocationPermissionScreen> createState() => _LocationPermissionScreenState();
@@ -81,7 +81,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
               Container(
                 padding: const EdgeInsets.all(30),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -122,7 +122,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -153,7 +153,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
                   onPressed: isRequestingPermissions ? null : _requestPermissions,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF8B5CF6),
-                    disabledBackgroundColor: const Color(0xFF8B5CF6).withOpacity(0.6),
+                    disabledBackgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.6),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),

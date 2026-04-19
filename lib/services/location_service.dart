@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
+import 'package:geocoding/geocoding.dart' as geo;
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 
 class LocationService {
-  static const String _apiKey = "AIzaSyA6uK1raTG6fNpw5twxbX0tfveW6Rd5YNE";
+  static const String _apiKey = "AIzaSyAtGcgY_MayhcKQRUJRTRoV5d3vvxOYOwQ";
 
   /// =====================================================
   /// CURRENT LOCATION
@@ -18,16 +21,42 @@ class LocationService {
   /// GET ADDRESS FROM COORDINATES
   /// =====================================================
   static Future<String> getAddressFromCoordinates(double lat, double lng) async {
-    final url = Uri.parse(
-      "https://maps.googleapis.com/maps/api/geocode/json"
-          "?latlng=$lat,$lng&key=$_apiKey",
-    );
+    // Native geocoding on Android/iOS — no API key required
+    if (!kIsWeb) {
+      try {
+        final placemarks = await geo.placemarkFromCoordinates(lat, lng);
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          final parts = [
+            p.name,
+            p.subLocality,
+            p.locality,
+            p.administrativeArea,
+          ].where((s) => s != null && s.isNotEmpty).map((s) => s!).toList();
+          if (parts.isNotEmpty) return parts.join(', ');
+        }
+      } catch (e) {
+        debugPrint('Native geocoding failed, trying API: $e');
+      }
+    }
 
-    final res = await http.get(url);
-    final data = jsonDecode(res.body);
+    // Fallback: Google Geocoding API (web, or if native fails)
+    try {
+      final url = Uri.parse(
+        "https://maps.googleapis.com/maps/api/geocode/json"
+            "?latlng=$lat,$lng&key=$_apiKey",
+      );
+      final res = await http.get(url).timeout(const Duration(seconds: 5));
+      final data = jsonDecode(res.body);
+      if (data["status"] == "OK" && (data["results"] as List).isNotEmpty) {
+        return data["results"][0]["formatted_address"];
+      }
+      debugPrint('Geocoding API status: ${data["status"]}');
+    } catch (e) {
+      debugPrint('Geocoding API error: $e');
+    }
 
-    if (data["results"].isEmpty) return "Unknown location";
-    return data["results"][0]["formatted_address"];
+    return '$lat, $lng'; // Last resort: show raw coordinates
   }
 
   /// =====================================================
@@ -79,12 +108,26 @@ class LocationService {
   /// POSITION STREAM (REAL-TIME LIVE TRACKING)
   /// ==============================================
   static Stream<Position> getPositionStream() {
-    return Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
+    final LocationSettings locationSettings;
+
+    if (Platform.isAndroid) {
+      locationSettings = AndroidSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 5, // meters
-      ),
-    );
+        distanceFilter: 5,
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationTitle: "TrackMate – Trip in progress",
+          notificationText: "Tracking your route in the background",
+          enableWakeLock: true,
+        ),
+      );
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 5,
+      );
+    }
+
+    return Geolocator.getPositionStream(locationSettings: locationSettings);
   }
 
 

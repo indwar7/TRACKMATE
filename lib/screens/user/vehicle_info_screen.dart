@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:trackmate_app/controllers/profile_controller.dart';
 
 class VehicleInfoScreen extends StatefulWidget {
-  const VehicleInfoScreen({Key? key}) : super(key: key);
+  const VehicleInfoScreen({super.key});
 
   @override
   State<VehicleInfoScreen> createState() => _VehicleInfoScreenState();
@@ -202,7 +202,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                   color: const Color(0xFF2A2A3E),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.3),
+                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
                     width: 2,
                     style: BorderStyle.solid,
                   ),
@@ -221,7 +221,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                     Icon(
                       Icons.upload_file,
                       size: 60,
-                      color: const Color(0xFF8B5CF6).withOpacity(0.6),
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.6),
                     ),
                     const SizedBox(height: 12),
                     const Text(
@@ -243,10 +243,10 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
+                  color: Colors.green.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.green.withOpacity(0.5),
+                    color: Colors.green.withValues(alpha: 0.5),
                   ),
                 ),
                 child: const Row(

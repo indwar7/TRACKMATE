@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:trackmate_app/screens/chat_screen/chat_screen.dart';
 
 import 'package:trackmate_app/screens/onboarding/home_screen.dart';
-import 'package:trackmate_app/screens/planned_trip_screen.dart';
 import 'package:trackmate_app/screens/user/profile_screen.dart';
 
 import 'package:trackmate_app/screens/auth/login_screen.dart';

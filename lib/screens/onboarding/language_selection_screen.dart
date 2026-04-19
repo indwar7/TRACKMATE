@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:trackmate_app/controllers/language_controller.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
-  const LanguageSelectionScreen({Key? key}) : super(key: key);
+  const LanguageSelectionScreen({super.key});
 
   @override
   _LanguageSelectionScreenState createState() =>
@@ -43,7 +43,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             child: TextField(
               decoration: InputDecoration(
                 hintText: 'Search language',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                 prefixIcon: const Icon(Icons.search, color: Colors.white),
                 filled: true,
                 fillColor: const Color(0xFF0F0F1E),

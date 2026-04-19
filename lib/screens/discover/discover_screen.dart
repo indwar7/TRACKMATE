@@ -6,7 +6,7 @@ import 'discover_item.dart';
 import 'discover_detail_screen.dart';
 
 class DiscoverScreen extends StatelessWidget {
-  const DiscoverScreen({Key? key}) : super(key: key);
+  const DiscoverScreen({super.key});
 
   // Trending theme chips
   List<Map<String, String>> get themes => const [
@@ -151,7 +151,7 @@ class DiscoverScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
+          color: Colors.white.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.white12),
         ),
@@ -201,7 +201,7 @@ class DiscoverScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.greenAccent.withOpacity(0.14),
+        color: Colors.greenAccent.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -219,7 +219,7 @@ class DiscoverScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.orangeAccent.withOpacity(0.14),
+        color: Colors.orangeAccent.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

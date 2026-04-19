@@ -140,7 +140,7 @@ class _ManualTripEntryScreenState extends State<ManualTripEntryScreen> {
         "ticket_cost": double.parse(_ticketCostController.text),
       };
 
-      print('Submitting manual trip: $requestBody');
+      debugPrint('Submitting manual trip: $requestBody');
 
       final response = await http.post(
         Uri.parse('${ApiService.baseUrl}/trips/create-manual/'),
@@ -148,8 +148,8 @@ class _ManualTripEntryScreenState extends State<ManualTripEntryScreen> {
         body: jsonEncode(requestBody),
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         if (mounted) {
@@ -166,7 +166,7 @@ class _ManualTripEntryScreenState extends State<ManualTripEntryScreen> {
         throw Exception('Failed to create trip: ${response.body}');
       }
     } catch (e) {
-      print('Error submitting trip: $e');
+      debugPrint('Error submitting trip: $e');
       _showError('Failed to save trip: $e');
     } finally {
       if (mounted) {
@@ -250,7 +250,7 @@ class _ManualTripEntryScreenState extends State<ManualTripEntryScreen> {
                           Text(
                             'Trip Date',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.6),
+                              color: Colors.white.withValues(alpha: 0.6),
                               fontSize: 12,
                             ),
                           ),
@@ -278,7 +278,7 @@ class _ManualTripEntryScreenState extends State<ManualTripEntryScreen> {
               Text(
                 'Mode of Travel',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -323,7 +323,7 @@ class _ManualTripEntryScreenState extends State<ManualTripEntryScreen> {
               Text(
                 'Trip Purpose',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -515,8 +515,8 @@ class _ManualTripEntryScreenState extends State<ManualTripEntryScreen> {
           prefixIcon: Icon(icon, color: iconColor, size: 20),
           labelText: label,
           hintText: hint,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14),
+          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
@@ -548,7 +548,7 @@ class _ManualTripEntryScreenState extends State<ManualTripEntryScreen> {
           prefixIcon: Icon(icon, color: Color(0xFFA78BFA), size: 18),
           labelText: label,
           prefixText: '₹ ',
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13),
+          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
           prefixStyle: const TextStyle(color: Colors.white),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

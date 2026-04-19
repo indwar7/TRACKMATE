@@ -100,9 +100,9 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
           onChanged: _searchLocation,
           decoration: InputDecoration(
             labelText: widget.label,
-            labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+            labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
             hintText: 'Search location...',
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
             prefixIcon: Icon(Icons.search, color: widget.accentColor),
             suffixIcon: _isSearching
                 ? const SizedBox(
@@ -130,7 +130,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -146,14 +146,14 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
             decoration: BoxDecoration(
               color: const Color(0xFF16213e),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: widget.accentColor.withOpacity(0.3)),
+              border: Border.all(color: widget.accentColor.withValues(alpha: 0.3)),
             ),
             child: ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _suggestions.length,
               separatorBuilder: (_, __) => Divider(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 height: 1,
               ),
               itemBuilder: (context, index) {

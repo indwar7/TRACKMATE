@@ -35,9 +35,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
     setState(() => loading = true);
     final res = await http.post(
-      Uri.parse("http://56.228.42.249/api/auth/verify/"),
+      Uri.parse("http://13.60.63.106/api/auth/verify/"),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email, "otp": getCode()}),
+      body: jsonEncode({"email": email, "code": getCode()}),
     );
 
     setState(() => loading = false);

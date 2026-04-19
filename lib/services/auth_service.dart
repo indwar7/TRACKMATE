@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService extends GetxService {
-  final _isLoggedIn = false.obs;
+  final _isLoggedIn = true.obs;
   final _token = ''.obs;
   final _email = ''.obs;
   final _username = ''.obs;
@@ -44,7 +44,9 @@ class AuthService extends GetxService {
       if (_isLoggedIn.value) {
         debugPrint('✅ Auth state loaded - User is logged in');
         debugPrint('   Email: $_email');
-        debugPrint('   Token: ${_token.value.isNotEmpty ? "${_token.value.substring(0, 20)}..." : "NONE"}');
+        debugPrint(
+          '   Token: ${_token.value.isNotEmpty ? "${_token.value.substring(0, 20)}..." : "NONE"}',
+        );
       } else {
         debugPrint('ℹ️ Auth state loaded - User is NOT logged in');
       }

@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:trackmate_app/services/api_service.dart';
 
 class StatsService {
-  static const String baseUrl = "http://56.228.42.249/";
+  static const String baseUrl = "http://13.60.63.106/";
 
   /// We will reuse api_service token system
   final ApiService api = ApiService();
@@ -16,11 +17,11 @@ class StatsService {
 
     final token = api.accessToken;
     if (token == null || token.isEmpty) {
-      print("❌ [StatsService] No access token found");
+      debugPrint("❌ [StatsService] No access token found");
       return null;
     }
 
-    print("🔐 [StatsService] Using Bearer token: ${token.substring(0, 12)}...");
+    debugPrint("🔐 [StatsService] Using Bearer token: ${token.substring(0, 12)}...");
     return token;
   }
 
@@ -45,8 +46,8 @@ class StatsService {
       },
     );
 
-    print("📡 [Daily Score] Status: ${res.statusCode}");
-    print("📦 Response: ${res.body}");
+    debugPrint("📡 [Daily Score] Status: ${res.statusCode}");
+    debugPrint("📦 Response: ${res.body}");
 
     if (res.statusCode == 200) {
       return jsonDecode(res.body);
@@ -78,8 +79,8 @@ class StatsService {
       },
     );
 
-    print("📡 [Calendar Stats] Status: ${res.statusCode}");
-    print("📦 Response: ${res.body}");
+    debugPrint("📡 [Calendar Stats] Status: ${res.statusCode}");
+    debugPrint("📦 Response: ${res.body}");
 
     if (res.statusCode == 200) {
       return jsonDecode(res.body);
@@ -111,8 +112,8 @@ class StatsService {
       },
     );
 
-    print("📡 [Monthly Chart] Status: ${res.statusCode}");
-    print("📦 Response: ${res.body}");
+    debugPrint("📡 [Monthly Chart] Status: ${res.statusCode}");
+    debugPrint("📦 Response: ${res.body}");
 
     if (res.statusCode == 200) {
       return jsonDecode(res.body);

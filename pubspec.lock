@@ -113,14 +113,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
-  email_otp_auth:
-    dependency: "direct main"
-    description:
-      name: email_otp_auth
-      sha256: "8767b5a4a6dbb163827a554bb1674b081765e7e9a7a3b42903320bfb0d950fc8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   equatable:
     dependency: transitive
     description:

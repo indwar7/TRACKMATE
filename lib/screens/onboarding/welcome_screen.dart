@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class WelcomeScreen extends StatelessWidget {
                     width: 150,
                     height: 150,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -145,7 +145,7 @@ class WelcomeScreen extends StatelessWidget {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: const Color(0xFF8B5CF6).withOpacity(0.2),
+            color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(

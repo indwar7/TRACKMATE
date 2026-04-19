@@ -1,12 +1,10 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
 import '../../services/location_service.dart';
-import 'onboarding/home_screen.dart';
-import 'package:http/http.dart' as http;
 
 class TripEndFormScreen extends StatefulWidget {
   final int tripId;
@@ -47,7 +45,7 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
   String? _selectedEndAddress;
   final Set<Marker> _markers = {};
 
-  bool _showForm = false;
+  bool _showForm = true; // skip map, go straight to form
   bool _isLoading = false;
 
   // Form controllers
@@ -412,7 +410,7 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
                       backgroundColor: const Color(0xFF00adb5),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      disabledBackgroundColor: const Color(0xFF00adb5).withOpacity(0.5),
+                      disabledBackgroundColor: const Color(0xFF00adb5).withValues(alpha: 0.5),
                     ),
                     child: _isLoading
                         ? const SizedBox(
@@ -445,7 +443,7 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
             Text(
               'Companion Details (Optional)',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -458,10 +456,10 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
           margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFF16213e).withOpacity(0.5),
+            color: const Color(0xFF16213e).withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: const Color(0xFF00adb5).withOpacity(0.2),
+              color: const Color(0xFF00adb5).withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -471,7 +469,7 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
               Text(
                 'Companion ${index + 1}',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -483,8 +481,8 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
                 decoration: InputDecoration(
                   labelText: 'Name',
                   hintText: 'Enter companion name',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                  labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
                   prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF00adb5), size: 20),
                   filled: true,
                   fillColor: const Color(0xFF0f0f1e),
@@ -503,8 +501,8 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
                 decoration: InputDecoration(
                   labelText: 'Phone Number',
                   hintText: 'Enter phone number',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                  labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
                   prefixIcon: const Icon(Icons.phone_outlined, color: Color(0xFF00adb5), size: 20),
                   filled: true,
                   fillColor: const Color(0xFF0f0f1e),
@@ -538,10 +536,10 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00adb5).withOpacity(0.15),
+                  color: const Color(0xFF00adb5).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: const Color(0xFF00adb5).withOpacity(0.3),
+                    color: const Color(0xFF00adb5).withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -569,11 +567,11 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               labelText: 'Mode of Travel',
-              labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+              labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
               prefixIcon: const Icon(Icons.directions_car, color: Color(0xFF00adb5)),
               filled: true,
               fillColor: isDetected
-                  ? const Color(0xFF00adb5).withOpacity(0.1)
+                  ? const Color(0xFF00adb5).withValues(alpha: 0.1)
                   : const Color(0xFF16213e),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -607,7 +605,7 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: 'Trip Purpose',
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
           prefixIcon: const Icon(Icons.work, color: Color(0xFF00adb5)),
           filled: true,
           fillColor: const Color(0xFF16213e),
@@ -650,7 +648,7 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
           prefixIcon: icon != null ? Icon(icon, color: const Color(0xFF00adb5)) : null,
           filled: true,
           fillColor: fillColor ?? const Color(0xFF16213e),
@@ -663,14 +661,14 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(BuildContext ctx) async {
     final picked = await showDatePicker(
-      context: context,
+      context: ctx,
       initialDate: DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-    if (picked != null) {
+    if (picked != null && mounted) {
       final time = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
@@ -689,120 +687,95 @@ class _TripEndFormScreenState extends State<TripEndFormScreen> {
 
     setState(() => _isLoading = true);
 
+    // Build trip record from form data
+    final now = DateTime.now();
+    final tripRecord = {
+      'local_id': now.millisecondsSinceEpoch,
+      'trip_id': widget.tripId,
+      'start_location_name': widget.startLocation,
+      'end_location_name': _selectedEndAddress ?? widget.endLocation,
+      'start_latitude': widget.startLat,
+      'start_longitude': widget.startLng,
+      'end_latitude': _selectedEndPoint?.latitude ?? widget.endLat,
+      'end_longitude': _selectedEndPoint?.longitude ?? widget.endLng,
+      'distance_km': double.tryParse(_distanceController.text) ?? widget.distance,
+      'duration_minutes': int.tryParse(_durationController.text) ?? widget.duration,
+      'mode_of_travel': _modeBackendMap[_modeController.text] ?? _modeController.text,
+      'trip_purpose': _purposeBackendMap[_purposeController.text] ?? _purposeController.text,
+      'number_of_companions': int.tryParse(_companionsController.text) ?? 0,
+      'co2_kg': double.tryParse(_co2Controller.text) ?? 0.0,
+      'fuel_expense': double.tryParse(_fuelCostController.text) ?? 0.0,
+      'parking_cost': double.tryParse(_parkingController.text) ?? 0.0,
+      'toll_cost': double.tryParse(_tollController.text) ?? 0.0,
+      'ticket_cost': double.tryParse(_ticketController.text) ?? 0.0,
+      'total_cost': double.tryParse(_totalCostController.text) ?? 0.0,
+      'start_time': now.subtract(Duration(minutes: widget.duration)).toIso8601String(),
+      'end_time': now.toIso8601String(),
+      'source': 'local',
+    };
+
+    // Always save locally first — guaranteed trip history entry
+    _saveLocalTrip(tripRecord);
+
     try {
-      final api = context.read<ApiService>();
-
-      // ✅ NEW: Collect companion data (only if filled)
-      List<Map<String, String>> companionData = [];
-      for (int i = 0; i < _companionControllers.length; i++) {
-        final name = _companionControllers[i]['name']?.text.trim() ?? '';
-        final phone = _companionControllers[i]['phone']?.text.trim() ?? '';
-
-        if (name.isNotEmpty || phone.isNotEmpty) {
-          companionData.add({
-            'name': name,
-            'phone': phone,
-          });
+      // Also try to save to backend if we have a valid trip ID
+      if (widget.tripId > 0) {
+        final api = context.read<ApiService>();
+        List<Map<String, String>> companionData = [];
+        for (final c in _companionControllers) {
+          final name = c['name']?.text.trim() ?? '';
+          final phone = c['phone']?.text.trim() ?? '';
+          if (name.isNotEmpty || phone.isNotEmpty) {
+            companionData.add({'name': name, 'phone': phone});
+          }
         }
-      }
-
-      debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      debugPrint('🚀 STARTING TRIP SUBMISSION');
-      debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      debugPrint('Trip ID: ${widget.tripId}');
-      debugPrint('Companion Count: $_companionCount');
-      debugPrint('Companion Data: $companionData');
-      debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
-      final result = await api.endTrip(
-        tripId: widget.tripId,
-        endLat: _selectedEndPoint!.latitude,
-        endLng: _selectedEndPoint!.longitude,
-        endLocationName: _selectedEndAddress,
-        modeOfTravel: _modeBackendMap[_modeController.text],
-        tripPurpose: _purposeBackendMap[_purposeController.text],
-        companions: int.tryParse(_companionsController.text),
-        companionDetails: companionData.isEmpty ? null : companionData, // ✅ NEW
-        fuelExpense: _fuelCostController.text.isEmpty
-            ? null
-            : double.tryParse(_fuelCostController.text),
-        parkingCost: _parkingController.text.isEmpty
-            ? null
-            : double.tryParse(_parkingController.text),
-        tollCost: _tollController.text.isEmpty
-            ? null
-            : double.tryParse(_tollController.text),
-        ticketCost: _ticketController.text.isEmpty
-            ? null
-            : double.tryParse(_ticketController.text),
-      );
-
-      debugPrint('✅ Trip saved successfully!');
-      debugPrint('Response: $result');
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Trip saved successfully!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
+        await api.endTrip(
+          tripId: widget.tripId,
+          endLat: tripRecord['end_latitude'] as double,
+          endLng: tripRecord['end_longitude'] as double,
+          endLocationName: tripRecord['end_location_name'] as String,
+          modeOfTravel: tripRecord['mode_of_travel'] as String,
+          tripPurpose: tripRecord['trip_purpose'] as String,
+          companions: tripRecord['number_of_companions'] as int,
+          companionDetails: companionData.isEmpty ? null : companionData,
+          fuelExpense: (tripRecord['fuel_expense'] as double) > 0 ? tripRecord['fuel_expense'] as double : null,
+          parkingCost: (tripRecord['parking_cost'] as double) > 0 ? tripRecord['parking_cost'] as double : null,
+          tollCost: (tripRecord['toll_cost'] as double) > 0 ? tripRecord['toll_cost'] as double : null,
+          ticketCost: (tripRecord['ticket_cost'] as double) > 0 ? tripRecord['ticket_cost'] as double : null,
         );
-
-        await Future.delayed(const Duration(milliseconds: 800));
-
-        if (mounted) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-                (route) => false,
-          );
-        }
+        debugPrint('✅ Trip also saved to backend');
       }
     } catch (e) {
-      debugPrint('❌ ERROR SAVING TRIP: $e');
-
-      if (mounted) {
-        final errorMsg = e.toString().toLowerCase();
-        if (errorMsg.contains('401') ||
-            errorMsg.contains('unauthorized') ||
-            errorMsg.contains('session expired') ||
-            errorMsg.contains('token') ||
-            errorMsg.contains('authentication')) {
-
-          final api = context.read<ApiService>();
-          await api.clearTokens();
-
-          _showError('Session expired. Please login again.');
-
-          await Future.delayed(const Duration(seconds: 2));
-          if (mounted) {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/login',
-                  (route) => false,
-            );
-          }
-        } else {
-          _showError('Failed to save trip: ${e.toString()}');
-        }
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      debugPrint('⚠️ Backend save failed (local copy saved): $e');
     }
-  }
 
-  void _showError(String message) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
+        const SnackBar(
+          content: Text('Trip saved!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
         ),
       );
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (mounted) {
+        Get.offAllNamed('/home');
+      }
+    }
+
+    if (mounted) setState(() => _isLoading = false);
+  }
+
+  void _saveLocalTrip(Map<String, dynamic> trip) {
+    try {
+      final box = GetStorage();
+      final List existing = box.read<List>('local_trips') ?? [];
+      existing.insert(0, trip); // newest first
+      box.write('local_trips', existing);
+      debugPrint('✅ Trip saved locally (${existing.length} total)');
+    } catch (e) {
+      debugPrint('❌ Local save failed: $e');
     }
   }
+
 }

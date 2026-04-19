@@ -119,19 +119,19 @@ class AppBorderRadius {
 
 class AppShadows {
   static BoxShadow primary = BoxShadow(
-    color: AppColors.primary.withOpacity(0.3),
+    color: AppColors.primary.withValues(alpha: 0.3),
     blurRadius: 15,
     offset: const Offset(0, 5),
   );
 
   static BoxShadow card = BoxShadow(
-    color: Colors.black.withOpacity(0.2),
+    color: Colors.black.withValues(alpha: 0.2),
     blurRadius: 10,
     offset: const Offset(0, 3),
   );
 
   static BoxShadow subtle = BoxShadow(
-    color: Colors.black.withOpacity(0.1),
+    color: Colors.black.withValues(alpha: 0.1),
     blurRadius: 5,
     offset: const Offset(0, 2),
   );
@@ -204,7 +204,7 @@ class AppButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? AppColors.primary,
           foregroundColor: textColor ?? Colors.white,
-          disabledBackgroundColor: (backgroundColor ?? AppColors.primary).withOpacity(0.6),
+          disabledBackgroundColor: (backgroundColor ?? AppColors.primary).withValues(alpha: 0.6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppBorderRadius.lg),
           ),
@@ -340,7 +340,7 @@ class AppIconButton extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppBorderRadius.md),
                 ),
                 child: Icon(icon, color: color, size: 32),

@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 
 /// --------------------
 /// RESET OTP SCREEN
@@ -38,7 +36,7 @@ class _OtpVerificationResetScreenState extends State<OtpVerificationResetScreen>
 
   String getOTP() => otp.map((e) => e.text).join();
 
-  Future<void> verifyOTP() async {
+  void verifyOTP() {
     final code = getOTP();
 
     if (code.length < 6) {
@@ -46,21 +44,10 @@ class _OtpVerificationResetScreenState extends State<OtpVerificationResetScreen>
       return;
     }
 
-    final response = await http.post(
-      Uri.parse("http://56.228.42.249/api/auth/reset-password/"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "email": email,
-        "code": code,
-        "new_password": "temp123"   // only OTP verification step
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      Get.toNamed("/reset-password", arguments: email);
-    } else {
-      setState(() => error = "Otp is not Correct");
-    }
+    Get.toNamed("/reset-password", arguments: {
+      "email": email,
+      "otp": code,
+    });
   }
 
   @override

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class InviteFriendsScreen extends StatefulWidget {
-  const InviteFriendsScreen({Key? key}) : super(key: key);
+  const InviteFriendsScreen({super.key});
 
   @override
   State<InviteFriendsScreen> createState() => _InviteFriendsScreenState();
@@ -106,7 +106,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.3),
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -117,7 +117,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -170,13 +170,13 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isInvited
-                          ? const Color(0xFF10B981).withOpacity(0.3)
+                          ? const Color(0xFF10B981).withValues(alpha: 0.3)
                           : Colors.transparent,
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -203,7 +203,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                               BoxShadow(
                                 color: (isInvited
                                     ? const Color(0xFF10B981)
-                                    : const Color(0xFF8B5CF6)).withOpacity(0.4),
+                                    : const Color(0xFF8B5CF6)).withValues(alpha: 0.4),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -248,7 +248,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                                         vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF10B981).withOpacity(0.2),
+                                        color: const Color(0xFF10B981).withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Row(
@@ -314,7 +314,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                                     ? null
                                     : [
                                   BoxShadow(
-                                    color: const Color(0xFF8B5CF6).withOpacity(0.4),
+                                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),

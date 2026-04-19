@@ -176,7 +176,7 @@ class CostCalculatorController extends GetxController {
         isCalculated.value = true;
       }
     } catch (e) {
-      print('API Error: $e');
+      debugPrint('API Error: $e');
       // Fallback to local calculation
       calculateCost();
     }

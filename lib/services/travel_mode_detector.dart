@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:geolocator/geolocator.dart';
 
 class TravelModeDetector {
   // Speed thresholds in m/s (meters per second)

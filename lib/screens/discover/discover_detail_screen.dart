@@ -58,9 +58,9 @@ class DiscoverDetailScreen extends StatelessWidget {
             // STATUS + ETA
             Row(
               children: [
-                _pill("Status: ${item.status}", Colors.greenAccent.withOpacity(0.16), Colors.greenAccent),
+                _pill("Status: ${item.status}", Colors.greenAccent.withValues(alpha: 0.16), Colors.greenAccent),
                 const SizedBox(width: 10),
-                _pill("Timeline: ${item.eta}", Colors.orangeAccent.withOpacity(0.16), Colors.orangeAccent),
+                _pill("Timeline: ${item.eta}", Colors.orangeAccent.withValues(alpha: 0.16), Colors.orangeAccent),
               ],
             ),
 

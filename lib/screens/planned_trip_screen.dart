@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
 import 'package:trackmate_app/services/location_service.dart';
-import 'saved_planned_trips_screen.dart';
 
 class PlannedTripScreen extends StatefulWidget {
   const PlannedTripScreen({super.key});
@@ -41,7 +40,7 @@ class _PlannedTripScreenState extends State<PlannedTripScreen> {
   bool _isGeocodingStart = false;
   bool _isGeocodingEnd = false;
 
-  static const String _googleApiKey = "AIzaSyA6uK1raTG6fNpw5twxbX0tfveW6Rd5YNE";
+  static const String _googleApiKey = "AIzaSyAtGcgY_MayhcKQRUJRTRoV5d3vvxOYOwQ";
 
   final List<Map<String, dynamic>> _modes = [
     {"value": "car", "label": "🚗 Car"},
@@ -261,7 +260,7 @@ class _PlannedTripScreenState extends State<PlannedTripScreen> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: selected
-                  ? const Color(0xFFf39c12).withOpacity(0.2)
+                  ? const Color(0xFFf39c12).withValues(alpha: 0.2)
                   : const Color(0xFF16213e),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
@@ -604,6 +603,7 @@ class _PlannedTripScreenState extends State<PlannedTripScreen> {
 
   // ✅ Submit Form - FIXED
   Future<void> _submitForm() async {
+    final api = context.read<ApiService>();
     // Validation
     if (_tripNameController.text.trim().isEmpty) {
       _show("Please enter trip name");
@@ -646,7 +646,6 @@ class _PlannedTripScreenState extends State<PlannedTripScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final api = context.read<ApiService>();
       await api.loadTokens();
 
       if (api.accessToken == null || api.accessToken!.isEmpty) {

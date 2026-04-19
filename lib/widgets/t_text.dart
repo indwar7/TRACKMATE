@@ -50,7 +50,7 @@ class TText extends StatelessWidget {
             // show original slightly faded while translating
             return Text(
               text,
-              style: style?.copyWith(color: style?.color?.withOpacity(0.6) ?? Colors.white70),
+              style: style?.copyWith(color: style?.color?.withValues(alpha: 0.6) ?? Colors.white70),
               textAlign: textAlign,
               maxLines: maxLines,
               overflow: TextOverflow.ellipsis,

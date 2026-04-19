@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../capture_id_screen.dart';
-import '../id_capture_tips_screen.dart';
 import '../screens/capture_id_screen.dart';
 import '../screens/id_capture_tips_screen.dart';
 

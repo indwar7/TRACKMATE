@@ -3,18 +3,6 @@ import 'package:get/get.dart';
 
 import '../../services/auth_service.dart';
 import '../../controllers/location_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:trackmate_app/services/api_service.dart';
-import 'package:trackmate_app/services/location_service.dart';
-
-import 'package:trackmate_app/screens/live_tracking_screen.dart';
-import 'package:trackmate_app/screens/manual_trip_screen.dart';
-import 'package:trackmate_app/screens/planned_trip_screen.dart';
-import 'package:trackmate_app/screens/trip_history_screen.dart';
-import 'package:trackmate_app/screens/statistics_detail_screen.dart';
 import 'package:trackmate_app/screens/my_stats_screen.dart';
 
 
@@ -412,7 +400,7 @@ class HomeScreen extends StatelessWidget {
                     flex: 50,
                     child: GestureDetector(
                       onTap: () => Get.toNamed('/live-tracking', arguments: {
-                        "tripId": 0, // Will be replaced by actual trip ID from startTrip API
+                        "tripId": 0,
                         "startLocation": "Home",
                       }),
                       child: Container(
@@ -745,7 +733,7 @@ class HomeScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

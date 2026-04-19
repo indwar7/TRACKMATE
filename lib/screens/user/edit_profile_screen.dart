@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:trackmate_app/controllers/profile_controller.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({Key? key}) : super(key: key);
+  const EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -118,7 +118,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   onTap: pickImage,
                   child: CircleAvatar(
                     radius: 60,
-                    backgroundColor: const Color(0xFF8B5CF6).withOpacity(0.2),
+                    backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                     backgroundImage: pickedImage != null
                         ? FileImage(pickedImage!)
                         : (profile.profileImage.value.isNotEmpty

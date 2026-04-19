@@ -23,13 +23,15 @@ import 'package:trackmate_app/screens/auth/otp_verification_reset.dart';
 // ================= SERVICES =================
 import 'package:trackmate_app/services/auth_service.dart';
 
+// ================= MIDDLEWARE =================
+import 'package:trackmate_app/middleware/auth_middleware.dart';
+
 // ================= CONTROLLERS ==============
 import 'package:trackmate_app/controllers/profile_controller.dart';
 import 'package:trackmate_app/controllers/language_controller.dart';
 import 'package:trackmate_app/controllers/location_controller.dart';
 
 // ================= ONBOARDING ================
-import 'package:trackmate_app/screens/onboarding/splash_screen.dart';
 import 'package:trackmate_app/screens/onboarding/welcome_screen.dart';
 import 'package:trackmate_app/screens/onboarding/permissions_screen.dart';
 import 'package:trackmate_app/screens/onboarding/terms_of_use_screen.dart';
@@ -50,8 +52,6 @@ import 'package:trackmate_app/screens/planned_trip_screen.dart';
 import 'package:trackmate_app/screens/saved_planned_trips_screen.dart';
 import 'package:trackmate_app/screens/trip_summary_screen.dart';
 import 'package:trackmate_app/screens/trip_history_screen.dart';
-import 'package:trackmate_app/screens/trip_end_form_screen.dart';
-
 // ================= USER =====================
 import 'package:trackmate_app/screens/user/profile_screen.dart' as UserProfile;
 import 'package:trackmate_app/screens/user/settings_screen.dart';
@@ -75,7 +75,6 @@ import 'package:trackmate_app/screens/tools/invite_friends_screen.dart';
 import 'package:trackmate_app/screens/location_search_screen.dart';
 import 'package:trackmate_app/screens/edit_address_screen.dart';
 import 'package:trackmate_app/screens/places/add_work_screen.dart';
-import 'package:trackmate_app/screens/statistics_detail_screen.dart';
 
 
 // =============================================================
@@ -99,9 +98,10 @@ Future<void> main() async {
   Get.put(LanguageController(), permanent: true);
   Get.put(LocationController(), permanent: true);
 
-  // Load tokens
+  // Load tokens and register ApiService with GetX so Get.find<ApiService>() works
   final apiService = ApiService();
   await apiService.loadTokens();
+  Get.put(apiService, permanent: true);
 
   // =============================================================
   //                  ONBOARDING STATE LOGIC
@@ -174,35 +174,80 @@ class TrackMateApp extends StatelessWidget {
       // =============================================================
       getPages: [
 
-        /// ---------------- ONBOARDING ----------------
+        /// ---------------- ONBOARDING (public) -------
         GetPage(name: "/welcome", page: () => const WelcomeScreen()),
         GetPage(name: "/permissions", page: () => const LocationPermissionScreen()),
         GetPage(name: "/terms", page: () => const TermsOfUseScreen()),
-        GetPage(name: "/home", page: () => const MainNavigationScreen()),
 
-        /// ---------------- AUTH ----------------------
+        /// ---------------- AUTH (public) -------------
         GetPage(name: "/login", page: () => const LoginScreen()),
         GetPage(name: "/signup", page: () => const SignUpScreen()),
-        GetPage(name: "/reset-password", page: () => const ResetPasswordScreen()),
         GetPage(name: "/otp", page: () => const OtpVerificationScreen()),
         GetPage(name: "/otp-reset", page: () => const OtpVerificationResetScreen()),
         GetPage(name: "/forgot-password", page: () => const ForgotPasswordScreen()),
         GetPage(name: "/forgot-otp", page: () => const ForgotOtpVerifyScreen()),
+        GetPage(name: "/reset-password", page: () => const ResetPasswordScreen()),
+
+        /// ---------------- PROTECTED ROUTES ----------
+        GetPage(
+          name: "/home",
+          page: () => const MainNavigationScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
 
         /// ---------------- MAIN ----------------------
-        GetPage(name: "/discover", page: () => const DiscoverScreen()),
-        GetPage(name: "/my-stats", page: () => const MyStatsScreen()),
-        GetPage(name: "/ai-chatbot", page: () =>  ChatScreen()),
-        GetPage(name: "/ai-checklist", page: () => const AiChecklistScreen()),
-        GetPage(name: "/cost-calculator", page: () => const CostCalculatorScreen()),
+        GetPage(
+          name: "/discover",
+          page: () => const DiscoverScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/my-stats",
+          page: () => const MyStatsScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/ai-chatbot",
+          page: () => ChatScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/ai-checklist",
+          page: () => const AiChecklistScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/cost-calculator",
+          page: () => const CostCalculatorScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
 
         /// ---------------- TRIP & MAP ----------------
-        GetPage(name: "/map", page: () => const MapScreen()),
-        GetPage(name: "/trip-history", page: () => const TripHistoryScreen()),
-        GetPage(name: "/saved-planned-trips", page: () => const ManualTripEntryScreen()),
-        GetPage(name: "/record-trip", page: () => const ManualTripScreen()),
-        GetPage(name: "/plan-trip", page: () => const PlannedTripScreen()),
-
+        GetPage(
+          name: "/map",
+          page: () => const MapScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/trip-history",
+          page: () => const TripHistoryScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/saved-planned-trips",
+          page: () => const ManualTripEntryScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/record-trip",
+          page: () => const ManualTripScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/plan-trip",
+          page: () => const PlannedTripScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
         GetPage(
           name: "/live-tracking",
           page: () {
@@ -212,39 +257,104 @@ class TrackMateApp extends StatelessWidget {
               startLocation: args['startLocation'] ?? '',
             );
           },
+          middlewares: [AuthMiddleware()],
         ),
-
         GetPage(
           name: "/trip-summary",
           page: () {
             final args = Get.arguments as Map<String, dynamic>? ?? {};
             return TripSummaryScreen(data: args);
           },
+          middlewares: [AuthMiddleware()],
         ),
 
         /// ---------------- USER ----------------------
-        GetPage(name: "/profile", page: () => const UserProfile.ProfileScreen()),
-        GetPage(name: "/edit-profile", page: () => const EditProfileScreen()),
-        GetPage(name: "/settings", page: () => const SettingsScreen()),
-        GetPage(name: "/support", page: () => const SupportScreen()),
-        GetPage(name: "/trusted-contacts", page: () => TrustedContactsScreen()),
-        GetPage(name: "/vehicle-info", page: () => const VehicleInfoScreen()),
+        GetPage(
+          name: "/profile",
+          page: () => const UserProfile.ProfileScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/edit-profile",
+          page: () => const EditProfileScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/settings",
+          page: () => const SettingsScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/support",
+          page: () => const SupportScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/trusted-contacts",
+          page: () => TrustedContactsScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/vehicle-info",
+          page: () => const VehicleInfoScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
 
         /// ---------------- VERIFICATION --------------
-        GetPage(name: "/user-verification", page: () => const UserVerificationScreen()),
-        GetPage(name: "/aadhaar", page: () => const AadhaarVerificationScreen()),
-        GetPage(name: "/capture-id", page: () => const CaptureIdScreen(isFront: true)),
-        GetPage(name: "/id-tips", page: () => const IdCaptureTipsScreen()),
-        GetPage(name: "/id-status", page: () => const IdStatusScreen()),
+        GetPage(
+          name: "/user-verification",
+          page: () => const UserVerificationScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/aadhaar",
+          page: () => const AadhaarVerificationScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/capture-id",
+          page: () => const CaptureIdScreen(isFront: true),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/id-tips",
+          page: () => const IdCaptureTipsScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/id-status",
+          page: () => const IdStatusScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
 
         /// ---------------- TOOLS ---------------------
-        GetPage(name: "/safety-tools", page: () => const SafetyToolsScreen()),
-        GetPage(name: "/invite", page: () => const InviteFriendsScreen()),
+        GetPage(
+          name: "/safety-tools",
+          page: () => const SafetyToolsScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/invite",
+          page: () => const InviteFriendsScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
 
         /// ---------------- LOCATIONS -----------------
-        GetPage(name: "/location-search", page: () => const LocationSearchScreen()),
-        GetPage(name: "/edit-address", page: () => const EditAddressScreen()),
-        GetPage(name: "/add-work", page: () => const AddWorkScreen()),
+        GetPage(
+          name: "/location-search",
+          page: () => const LocationSearchScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/edit-address",
+          page: () => const EditAddressScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
+        GetPage(
+          name: "/add-work",
+          page: () => const AddWorkScreen(),
+          middlewares: [AuthMiddleware()],
+        ),
       ],
     );
   }

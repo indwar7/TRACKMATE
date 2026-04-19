@@ -69,12 +69,12 @@ class _SplashScreenState extends State<SplashScreen>
                   width: 110,
                   height: 110,
                   decoration: BoxDecoration(
-                    color: purple.withOpacity(0.2),
+                    color: purple.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: purple.withOpacity(0.4), width: 3),
+                    border: Border.all(color: purple.withValues(alpha: 0.4), width: 3),
                     boxShadow: [
                       BoxShadow(
-                        color: purple.withOpacity(0.3),
+                        color: purple.withValues(alpha: 0.3),
                         blurRadius: 20,
                         spreadRadius: 4,
                       )
@@ -87,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen>
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Icon(
                         Icons.travel_explore,
-                        color: purple.withOpacity(0.8),
+                        color: purple.withValues(alpha: 0.8),
                         size: 56,
                       ),
                     ),
@@ -117,7 +117,7 @@ class _SplashScreenState extends State<SplashScreen>
                 Text(
                   "Smart Travel Companion",
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.65),
+                    color: Colors.white.withValues(alpha: 0.65),
                     fontSize: 14,
                   ),
                 ),

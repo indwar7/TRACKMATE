@@ -45,7 +45,7 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
         suggestions = results;
       });
     } catch (e) {
-      print('Error searching places: $e');
+      debugPrint('Error searching places: $e');
     }
   }
 

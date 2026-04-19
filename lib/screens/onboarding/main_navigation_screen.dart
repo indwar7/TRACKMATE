@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:trackmate_app/controllers/profile_controller.dart';
-import 'package:trackmate_app/services/auth_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import  'package:trackmate_app/screens/planned_trip_screen.dart';
+import 'package:trackmate_app/screens/planned_trip_screen.dart';
 
 // Screens
 import 'home_screen.dart';
 import '../map_screen.dart';
-import '../my_stats_screen.dart'; // ✅ ADDED (Fix MyStatsScreen error)
+import '../my_stats_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -37,7 +35,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           color: const Color(0xFF1A1A2E),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -100,7 +98,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFF7C3AED).withOpacity(0.2)
+                ? const Color(0xFF7C3AED).withValues(alpha: 0.2)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
@@ -137,7 +135,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 }
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +197,7 @@ class ProfileScreen extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 60,
-                backgroundColor: const Color(0xFF8B5CF6).withOpacity(0.2),
+                backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                 backgroundImage: controller.profileImage.value.isNotEmpty
                     ? NetworkImage(controller.profileImage.value)
                     : null,
@@ -305,7 +303,7 @@ class ProfileScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF8B5CF6).withOpacity(0.2),
+              color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: const Color(0xFF8B5CF6), size: 24),

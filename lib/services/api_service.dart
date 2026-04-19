@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = "http://56.228.42.249/api";
+  static const String baseUrl = "http://13.60.63.106/api";
   String? accessToken;
   String? refreshToken;
 
@@ -96,11 +96,19 @@ class ApiService {
     Get.offAllNamed('/login');
   }
 
-  /// Check response status and handle 401
+  /// Check response status and handle 401 — redirects to login
   Future<void> _checkResponse(http.Response response) async {
     if (response.statusCode == 401) {
       await _handleUnauthorized();
       throw Exception("Session expired. Please login again.");
+    }
+  }
+
+  /// Check 401 for trip endpoints — throws but does NOT redirect (tracking should continue)
+  void _checkTripResponse(http.Response response) {
+    if (response.statusCode == 401) {
+      debugPrint('⚠️ [Trip API] 401 — no valid token, skipping');
+      throw Exception("No auth token — trip API call skipped");
     }
   }
 
@@ -122,7 +130,12 @@ class ApiService {
         "password": password,
       }),
     );
-    return jsonDecode(response.body);
+    if (response.body.isEmpty) throw Exception('Empty response from server');
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(data['detail'] ?? data['message'] ?? 'Signup failed: ${response.statusCode}');
+    }
+    return data as Map<String, dynamic>;
   }
 
   Future<Map<String, dynamic>> verifyOtp({
@@ -137,7 +150,12 @@ class ApiService {
         "code": code,
       }),
     );
-    return jsonDecode(response.body);
+    if (response.body.isEmpty) throw Exception('Empty response from server');
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(data['detail'] ?? data['message'] ?? 'OTP verification failed: ${response.statusCode}');
+    }
+    return data as Map<String, dynamic>;
   }
 
   Future<bool> login({
@@ -230,7 +248,12 @@ class ApiService {
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"email": email}),
     );
-    return jsonDecode(response.body);
+    if (response.body.isEmpty) throw Exception('Empty response from server');
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(data['detail'] ?? data['message'] ?? 'Request failed: ${response.statusCode}');
+    }
+    return data as Map<String, dynamic>;
   }
 
   Future<Map<String, dynamic>> resetPassword({
@@ -247,7 +270,12 @@ class ApiService {
         "new_password": newPassword,
       }),
     );
-    return jsonDecode(response.body);
+    if (response.body.isEmpty) throw Exception('Empty response from server');
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception(data['detail'] ?? data['message'] ?? 'Password reset failed: ${response.statusCode}');
+    }
+    return data as Map<String, dynamic>;
   }
 
   /// =====================================================
@@ -294,7 +322,7 @@ class ApiService {
 
     final streamed = await request.send();
     final response = await http.Response.fromStream(streamed);
-    _checkResponse(response);
+    await _checkResponse(response);
     return jsonDecode(response.body);
   }
 
@@ -377,7 +405,7 @@ class ApiService {
 
     final streamed = await request.send();
     final response = await http.Response.fromStream(streamed);
-    _checkResponse(response);
+    await _checkResponse(response);
     return jsonDecode(response.body);
   }
 
@@ -421,7 +449,7 @@ class ApiService {
 
     final streamed = await request.send();
     final response = await http.Response.fromStream(streamed);
-    _checkResponse(response);
+    await _checkResponse(response);
     return jsonDecode(response.body);
   }
 
@@ -485,7 +513,7 @@ class ApiService {
       }
     }
 
-    await _checkResponse(response);
+    _checkTripResponse(response);
 
     if (response.statusCode == 201 || response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -533,21 +561,12 @@ class ApiService {
     double? speed,
     String? timestamp,
   }) async {
-    // Load tokens before making the request
     await loadTokens();
-    
-    // Double-check token is loaded
-    if (accessToken == null || accessToken!.isEmpty) {
-      debugPrint('❌ [addTrackingPoint] Token is null after loadTokens()!');
-      throw Exception("Authentication token missing. Please login again.");
-    }
-    
-    debugPrint('✅ [addTrackingPoint] Using token: ${accessToken!.substring(0, 20)}...');
-    
+
     // Round coordinates to 6 decimal places (backend requirement)
     final roundedLat = double.parse(lat.toStringAsFixed(6));
     final roundedLng = double.parse(lng.toStringAsFixed(6));
-    
+
     final body = {
       "latitude": roundedLat,
       "longitude": roundedLng,
@@ -556,14 +575,13 @@ class ApiService {
       if (timestamp != null) "timestamp": timestamp,
     };
 
-    // Build headers with token explicitly
-    // Backend expects Bearer format (as confirmed by Postman)
-    final requestHeaders = {
+    final requestHeaders = <String, String>{
       "Content-Type": "application/json",
-      "Authorization": "Bearer $accessToken",  // Backend uses Bearer
+      if (accessToken != null && accessToken!.isNotEmpty)
+        "Authorization": "Bearer $accessToken",
     };
     
-    debugPrint('📤 [addTrackingPoint] Request headers: Authorization = Bearer ${accessToken!.substring(0, 20)}...');
+    debugPrint('📤 [addTrackingPoint] Token: ${accessToken != null ? "${accessToken!.substring(0, 20)}..." : "none"}');
 
     final response = await http.post(
       Uri.parse("$baseUrl/trips/$tripId/add-tracking-point/"),
@@ -571,13 +589,12 @@ class ApiService {
       body: jsonEncode(body),
     );
 
-    await _checkResponse(response);
+    _checkTripResponse(response);
 
     if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception(
-          'Failed to add tracking point: ${response.statusCode}');
+      throw Exception('Failed to add tracking point: ${response.statusCode}');
     }
   }
 
@@ -603,15 +620,7 @@ class ApiService {
       debugPrint('🚗 [END TRIP] ======================================');
       debugPrint('🚗 [END TRIP] Starting endTrip for ID: $tripId');
 
-      // STEP 1: Load token from SharedPreferences
       await loadTokens();
-
-      if (accessToken == null || accessToken!.isEmpty) {
-        debugPrint('❌ [END TRIP] NO TOKEN FOUND AFTER LOADING!');
-        throw Exception("Authentication token missing. Please login again.");
-      }
-
-      debugPrint('✅ [END TRIP] Token confirmed: ${accessToken!.substring(0, 20)}...');
 
       // Round coordinates to 6 decimal places (backend requirement)
       final roundedEndLat = double.parse(endLat.toStringAsFixed(6));
@@ -665,7 +674,7 @@ class ApiService {
       debugPrint('📦 [END TRIP] Response Body: ${response.body}');
 
       // STEP 4: Handle response
-      _checkResponse(response); // This will handle 401 and redirect to login
+      _checkTripResponse(response);
 
       if (response.statusCode == 200) {
         debugPrint('✅ [END TRIP] SUCCESS! Trip ended successfully');
@@ -765,7 +774,7 @@ class ApiService {
 
       final response = await http.get(uri, headers: headers);
 
-      _checkResponse(response); // This will handle 401 and redirect to login
+      await _checkResponse(response); // This will handle 401 and redirect to login
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -794,7 +803,7 @@ class ApiService {
       headers: headers,
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -906,7 +915,7 @@ class ApiService {
       body: jsonEncode(body),
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -982,7 +991,7 @@ class ApiService {
 
     final response = await http.get(uri, headers: headers);
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -1002,7 +1011,7 @@ class ApiService {
       body: jsonEncode(data),
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -1019,7 +1028,7 @@ class ApiService {
       headers: headers,
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -1037,7 +1046,7 @@ class ApiService {
       body: jsonEncode(data),
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -1056,7 +1065,7 @@ class ApiService {
       body: jsonEncode(data),
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -1073,7 +1082,7 @@ class ApiService {
       headers: headers,
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode != 204 && response.statusCode != 200) {
       throw Exception(
@@ -1088,7 +1097,7 @@ class ApiService {
       headers: headers,
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -1119,7 +1128,7 @@ class ApiService {
       body: jsonEncode(body),
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -1140,7 +1149,7 @@ class ApiService {
       }),
     );
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -1161,7 +1170,7 @@ class ApiService {
 
     final response = await http.get(uri, headers: headers);
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -1184,7 +1193,7 @@ class ApiService {
 
     final response = await http.get(uri, headers: headers);
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -1208,7 +1217,7 @@ class ApiService {
 
     final response = await http.get(uri, headers: headers);
 
-    _checkResponse(response);
+    await _checkResponse(response);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);

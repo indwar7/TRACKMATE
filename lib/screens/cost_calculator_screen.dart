@@ -25,7 +25,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
   late Animation<double> _fadeAnimation;
 
   // Replace with your actual Google Places API key
-  final String _placesApiKey = 'AIzaSyA6uK1raTG6fNpw5twxbX0tfveW6Rd5YNE';
+  final String _placesApiKey = 'AIzaSyAtGcgY_MayhcKQRUJRTRoV5d3vvxOYOwQ';
 
   @override
   void initState() {
@@ -294,7 +294,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFF6C63FF).withOpacity(0.2),
+            color: const Color(0xFF6C63FF).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Icon(Icons.calculate, color: Color(0xFF6C63FF), size: 32),
@@ -314,7 +314,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
           'Compare prices across different travel modes',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -329,7 +329,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -343,7 +343,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00D9FF).withOpacity(0.2),
+                  color: const Color(0xFF00D9FF).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.route, color: Color(0xFF00D9FF), size: 24),
@@ -388,7 +388,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
         onPressed: _isLoading ? null : _calculateCost,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF6C63FF),
-          disabledBackgroundColor: const Color(0xFF6C63FF).withOpacity(0.5),
+          disabledBackgroundColor: const Color(0xFF6C63FF).withValues(alpha: 0.5),
         ),
         child: _isLoading
             ? const SizedBox(
@@ -426,7 +426,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
           Text(
             'Calculating best routes...',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 14,
             ),
           ),
@@ -456,7 +456,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF6C63FF).withOpacity(0.3),
+                color: const Color(0xFF6C63FF).withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -472,7 +472,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
                     'Total Distance',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -490,7 +490,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(Icons.route, color: Colors.white, size: 32),
@@ -502,7 +502,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF00D9FF).withOpacity(0.15),
+            color: const Color(0xFF00D9FF).withValues(alpha: 0.15),
             border: Border.all(color: const Color(0xFF00D9FF), width: 2),
             borderRadius: BorderRadius.circular(24),
           ),
@@ -539,7 +539,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
                         const SizedBox(height: 4),
                         Text(
                           recommendation['reason'],
-                          style: TextStyle(fontSize: 13, color: Colors.white.withOpacity(0.7)),
+                          style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.7)),
                         ),
                       ],
                     ),
@@ -550,7 +550,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00D9FF).withOpacity(0.2),
+                  color: const Color(0xFF00D9FF).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -592,7 +592,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -617,7 +617,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
               mode == 'car'
                   ? 'Multiple fuel options available'
                   : '₹${option['estimated_cost_min']} - ₹${option['estimated_cost_max']}',
-              style: TextStyle(color: Colors.white.withOpacity(0.6)),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
             ),
           ),
           children: [
@@ -651,7 +651,7 @@ class _CostCalculatorScreenState extends State<CostCalculatorScreen>
             color: const Color(0xFF252B48),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Color(fuel['color'] as int).withOpacity(0.3),
+              color: Color(fuel['color'] as int).withValues(alpha: 0.3),
               width: 1,
             ),
           ),

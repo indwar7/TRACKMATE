@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/location_controller.dart';
 
 class LocationSearchScreen extends StatelessWidget {
-  LocationSearchScreen({Key? key}) : super(key: key);
+  LocationSearchScreen({super.key});
 
   final LocationController locationController = Get.find<LocationController>();
 

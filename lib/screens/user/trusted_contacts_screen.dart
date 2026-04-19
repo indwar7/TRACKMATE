@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:trackmate_app/controllers/profile_controller.dart';
 
 class TrustedContactsScreen extends StatelessWidget {
-  TrustedContactsScreen({Key? key}) : super(key: key);
+  TrustedContactsScreen({super.key});
 
   // 🚨 Emergency contacts (static)
   final List<Map<String, String>> emergencyContacts = const [
@@ -232,7 +232,7 @@ class TrustedContactsScreen extends StatelessWidget {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: const Color(0xFF8B5CF6).withOpacity(.3),
+                backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: .3),
                 child: Text(
                   name.isNotEmpty ? name[0].toUpperCase() : "?",
                   style: const TextStyle(color: Colors.white),

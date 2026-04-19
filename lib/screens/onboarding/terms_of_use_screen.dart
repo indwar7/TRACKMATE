@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class TermsOfUseScreen extends StatefulWidget {
-  const TermsOfUseScreen({Key? key}) : super(key: key);
+  const TermsOfUseScreen({super.key});
 
   @override
   State<TermsOfUseScreen> createState() => _TermsOfUseScreenState();
@@ -78,7 +78,7 @@ class _TermsOfUseScreenState extends State<TermsOfUseScreen> {
                 color: const Color(0xFF2A2A3E),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),

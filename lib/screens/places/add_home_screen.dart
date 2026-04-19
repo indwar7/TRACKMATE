@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:trackmate_app/screens/location_search_screen.dart';
 
 class AddHomeScreen extends StatefulWidget {
-  const AddHomeScreen({Key? key}) : super(key: key);
+  const AddHomeScreen({super.key});
 
   @override
   State<AddHomeScreen> createState() => _AddHomeScreenState();

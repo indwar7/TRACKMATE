@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class GooglePlacesService {
@@ -22,7 +23,7 @@ class GooglePlacesService {
       }
       return [];
     } catch (e) {
-      print('Error in searchPlaces: $e');
+      debugPrint('Error in searchPlaces: $e');
       return [];
     }
   }
@@ -43,7 +44,7 @@ class GooglePlacesService {
       }
       return null;
     } catch (e) {
-      print('Error in getPlaceDetails: $e');
+      debugPrint('Error in getPlaceDetails: $e');
       return null;
     }
   }

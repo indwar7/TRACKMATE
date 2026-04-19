@@ -5,7 +5,7 @@
 // import 'package:trackmate_app/services/auth_service.dart';
 //
 // class AuthWrapper extends StatelessWidget {
-//   const AuthWrapper({Key? key}) : super(key: key);
+//   const AuthWrapper({super.key});
 //
 //   @override
 //   Widget build(BuildContext context) {

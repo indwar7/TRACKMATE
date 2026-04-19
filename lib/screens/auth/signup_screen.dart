@@ -151,7 +151,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       final res = await http.post(
-        Uri.parse("http://56.228.42.249/api/auth/signup/"),
+        Uri.parse("http://13.60.63.106/api/auth/signup/"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "username": _username.text.trim(),
@@ -432,7 +432,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF8B5CF6),
                     disabledBackgroundColor:
-                    const Color(0xFF8B5CF6).withOpacity(0.6),
+                    const Color(0xFF8B5CF6).withValues(alpha: 0.6),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),

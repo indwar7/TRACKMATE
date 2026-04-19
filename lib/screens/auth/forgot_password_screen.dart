@@ -35,7 +35,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     });
 
     final response = await http.post(
-      Uri.parse("http://56.228.42.249/api/auth/forgot-password/"),
+      Uri.parse("http://13.60.63.106/api/auth/forgot-password/"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"email": text}),
     );

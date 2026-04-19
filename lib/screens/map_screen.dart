@@ -39,7 +39,7 @@ class _MapScreenState extends State<MapScreen> {
   double? _estimatedCost;
   String? _selectedMode = 'car';
 
-  static const String _googleApiKey = "AIzaSyA6uK1raTG6fNpw5twxbX0tfveW6Rd5YNE";
+  static const String _googleApiKey = "AIzaSyAtGcgY_MayhcKQRUJRTRoV5d3vvxOYOwQ";
 
   final List<Map<String, dynamic>> _modes = [
     {"value": "car", "label": "🚗 Car", "icon": Icons.directions_car},
@@ -155,7 +155,7 @@ class _MapScreenState extends State<MapScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -215,7 +215,7 @@ class _MapScreenState extends State<MapScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFF00adb5).withOpacity(0.2)
+                          ? const Color(0xFF00adb5).withValues(alpha: 0.2)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(

@@ -1,9 +1,8 @@
 // 📌 lib/controllers/profile_controller.dart
 
-import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:trackmate_app/services/auth_service.dart';
 
 class ProfileController extends GetxController {
@@ -54,7 +53,7 @@ class ProfileController extends GetxController {
       // For now just reload local storage.
       loadProfileFromStorage();
     } catch (e) {
-      print("❌ fetchProfile error: $e");
+      debugPrint("❌ fetchProfile error: $e");
     }
   }
 
@@ -108,7 +107,7 @@ class ProfileController extends GetxController {
             contacts.map((e) => Map<String, dynamic>.from(e)).toList();
       }
     } catch (e) {
-      print("❌ Load profile error: $e");
+      debugPrint("❌ Load profile error: $e");
     }
   }
 

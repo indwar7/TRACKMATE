@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../services/location_service.dart';
 import '../services/api_service.dart';
-import '../widgets/location_search_widget.dart';
 
 class ManualTripScreen extends StatefulWidget {
   const ManualTripScreen({super.key});
@@ -57,13 +57,12 @@ class _ManualTripScreenState extends State<ManualTripScreen> {
   Set<Polyline> _polylines = {};
 
   // ADD YOUR GOOGLE PLACES API KEY HERE
-  static const String _placesApiKey = 'AIzaSyA6uK1raTG6fNpw5twxbX0tfveW6Rd5YNE';
+  static const String _placesApiKey = 'AIzaSyAtGcgY_MayhcKQRUJRTRoV5d3vvxOYOwQ';
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
-    _testConnection();
   }
 
   Future<void> _getCurrentLocation() async {
@@ -299,39 +298,6 @@ class _ManualTripScreenState extends State<ManualTripScreen> {
     _totalCostController.text = total.toStringAsFixed(2);
   }
 
-  Future<void> _testConnection() async {
-    try {
-      final api = context.read<ApiService>();
-      final response = await http.get(
-        Uri.parse('${ApiService.baseUrl}/trips/'),
-        headers: api.headers,
-      );
-      print('✅ Connection test: ${response.statusCode}');
-      print('Response: ${response.body}');
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Connection successful! Status: ${response.statusCode}'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      print('❌ Connection failed: $e');
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Connection failed: $e'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
-    }
-  }
-
   void _onMapTap(LatLng position) async {
     if (_startLocation == null) {
       // Set start location
@@ -430,102 +396,101 @@ class _ManualTripScreenState extends State<ManualTripScreen> {
       return;
     }
 
-    if (_dateController.text.isEmpty) {
-      _showError('Please select trip date');
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     try {
-      final api = context.read<ApiService>();
-      await api.loadTokens();
+      final now = DateTime.now();
+      final tripDate = _dateController.text.isNotEmpty
+          ? _dateController.text
+          : '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
-      if (api.accessToken == null || api.accessToken!.isEmpty) {
-        _showError("No token found. Please login again.");
-        return;
-      }
+      // Build start_time from date + time fields
+      final timePart = _timeController.text.isNotEmpty ? _timeController.text : '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+      final startTime = DateTime.tryParse('${tripDate}T$timePart:00') ?? now;
 
-      // IMPORTANT: round lat/lng and send proper date format
-      final body = {
-        "start_location": _startController.text,
-        "start_latitude":
-        double.parse(_startLocation!.latitude.toStringAsFixed(6)),
-        "start_longitude":
-        double.parse(_startLocation!.longitude.toStringAsFixed(6)),
+      final durationMins = int.tryParse(_durationController.text) ?? 0;
+      final distance = double.tryParse(_distanceController.text) ?? 0.0;
+      final fuelCost = double.tryParse(_fuelCostController.text) ?? 0.0;
+      final parkingCost = double.tryParse(_parkingController.text) ?? 0.0;
+      final tollCost = double.tryParse(_tollController.text) ?? 0.0;
+      final ticketCost = double.tryParse(_ticketController.text) ?? 0.0;
+      final totalCost = double.tryParse(_totalCostController.text) ?? (fuelCost + parkingCost + tollCost + ticketCost);
 
-        "end_location": _endController.text,
-        "end_latitude":
-        double.parse(_endLocation!.latitude.toStringAsFixed(6)),
-        "end_longitude":
-        double.parse(_endLocation!.longitude.toStringAsFixed(6)),
-
-        // trip_date must be YYYY-MM-DD (we store it like this in _selectDate)
-        "trip_date": _dateController.text,
-        "mode_of_travel": _modeController.text.toLowerCase(),
+      final tripRecord = {
+        'local_id': now.millisecondsSinceEpoch,
+        'trip_id': 0,
+        'start_location_name': _startController.text,
+        'end_location_name': _endController.text,
+        'start_latitude': _startLocation!.latitude,
+        'start_longitude': _startLocation!.longitude,
+        'end_latitude': _endLocation!.latitude,
+        'end_longitude': _endLocation!.longitude,
+        'distance_km': distance,
+        'duration_minutes': durationMins,
+        'mode_of_travel': _modeController.text.toLowerCase(),
+        'trip_purpose': _purposeController.text.toLowerCase(),
+        'number_of_companions': int.tryParse(_companionsController.text) ?? 0,
+        'co2_kg': double.tryParse(_co2Controller.text) ?? 0.0,
+        'fuel_expense': fuelCost,
+        'parking_cost': parkingCost,
+        'toll_cost': tollCost,
+        'ticket_cost': ticketCost,
+        'total_cost': totalCost,
+        'start_time': startTime.toIso8601String(),
+        'end_time': startTime.add(Duration(minutes: durationMins)).toIso8601String(),
+        'source': 'local',
       };
 
-      // OPTIONAL FIELDS (only add if valid values exist)
+      // Always save locally first
+      final box = GetStorage();
+      final List existing = box.read<List>('local_trips') ?? [];
+      existing.insert(0, tripRecord);
+      box.write('local_trips', existing);
+      debugPrint('✅ Manual trip saved locally (${existing.length} total)');
 
-      if (_purposeController.text.isNotEmpty) {
-        body["trip_purpose"] = _purposeController.text.toLowerCase();
-      }
-
-      if (_companionsController.text.isNotEmpty) {
-        final numVal = int.tryParse(_companionsController.text);
-        if (numVal != null) body["number_of_companions"] = numVal;
-      }
-
-      if (_tollController.text.isNotEmpty) {
-        final numVal = double.tryParse(_tollController.text);
-        if (numVal != null) body["toll_cost"] = numVal;
-      }
-
-      if (_parkingController.text.isNotEmpty) {
-        final numVal = double.tryParse(_parkingController.text);
-        if (numVal != null) body["parking_cost"] = numVal;
-      }
-
-      if (_fuelCostController.text.isNotEmpty) {
-        final numVal = double.tryParse(_fuelCostController.text);
-        if (numVal != null) body["fuel_expense"] = numVal;
-      }
-
-      if (_ticketController.text.isNotEmpty) {
-        final numVal = double.tryParse(_ticketController.text);
-        if (numVal != null) body["ticket_cost"] = numVal;
-      }
-
-      final response = await http.post(
-        Uri.parse("${ApiService.baseUrl}/trips/create-manual/"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${api.accessToken}", // Bearer auth
-        },
-        body: jsonEncode(body),
-      );
-
-      print("📡 POST RESULT: ${response.statusCode}");
-      print("📦 BODY: ${response.body}");
-
-      if (response.statusCode == 201) {
-        if (mounted) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Trip saved successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
+      // Try backend silently
+      try {
+        final api = context.read<ApiService>();
+        if (api.accessToken != null && api.accessToken!.isNotEmpty) {
+          await http.post(
+            Uri.parse("${ApiService.baseUrl}/trips/create-manual/"),
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer ${api.accessToken}",
+            },
+            body: jsonEncode({
+              "start_location": _startController.text,
+              "start_latitude": double.parse(_startLocation!.latitude.toStringAsFixed(6)),
+              "start_longitude": double.parse(_startLocation!.longitude.toStringAsFixed(6)),
+              "end_location": _endController.text,
+              "end_latitude": double.parse(_endLocation!.latitude.toStringAsFixed(6)),
+              "end_longitude": double.parse(_endLocation!.longitude.toStringAsFixed(6)),
+              "trip_date": tripDate,
+              "mode_of_travel": _modeController.text.toLowerCase(),
+              if (_purposeController.text.isNotEmpty) "trip_purpose": _purposeController.text.toLowerCase(),
+              if ((int.tryParse(_companionsController.text) ?? 0) > 0)
+                "number_of_companions": int.tryParse(_companionsController.text),
+              if (fuelCost > 0) "fuel_expense": fuelCost,
+              if (parkingCost > 0) "parking_cost": parkingCost,
+              if (tollCost > 0) "toll_cost": tollCost,
+              if (ticketCost > 0) "ticket_cost": ticketCost,
+            }),
+          ).timeout(const Duration(seconds: 5));
         }
-      } else {
-        // LOG FULL SERVER ERROR
-        throw Exception("Failed (${response.statusCode}): ${response.body}");
+      } catch (e) {
+        debugPrint('⚠️ Backend save failed (local copy saved): $e');
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Trip saved!'), backgroundColor: Colors.green),
+        );
+        Navigator.pop(context);
       }
     } catch (e) {
-      _showError(e.toString());
+      _showError('Failed to save trip: $e');
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -543,11 +508,6 @@ class _ManualTripScreenState extends State<ManualTripScreen> {
         title: const Text('Save Untracked Trip'),
         backgroundColor: const Color(0xFF16213e),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.wifi),
-            onPressed: _testConnection,
-            tooltip: 'Test Connection',
-          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _resetLocations,
@@ -792,7 +752,7 @@ class _ManualTripScreenState extends State<ManualTripScreen> {
                   decoration: InputDecoration(
                     hintText: label,
                     hintStyle: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 14,
                     ),
                     border: InputBorder.none,
@@ -821,7 +781,7 @@ class _ManualTripScreenState extends State<ManualTripScreen> {
               color: const Color(0xFF1a1a2e),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: const Color(0xFF00adb5).withOpacity(0.3),
+                color: const Color(0xFF00adb5).withValues(alpha: 0.3),
               ),
             ),
             child: Material(
@@ -831,7 +791,7 @@ class _ManualTripScreenState extends State<ManualTripScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 itemCount: suggestions.length > 5 ? 5 : suggestions.length,
                 separatorBuilder: (context, index) => Divider(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   height: 1,
                   thickness: 0.5,
                 ),
@@ -898,19 +858,19 @@ class _ManualTripScreenState extends State<ManualTripScreen> {
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+          labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
           prefixIcon:
           icon != null ? Icon(icon, color: const Color(0xFF00adb5)) : null,
           filled: true,
           fillColor:
-          readOnly ? const Color(0xFF16213e).withOpacity(0.5) : const Color(0xFF16213e),
+          readOnly ? const Color(0xFF16213e).withValues(alpha: 0.5) : const Color(0xFF16213e),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
           ),
           focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -964,9 +924,10 @@ class _ManualTripScreenState extends State<ManualTripScreen> {
           child: child!,
         );
       });
-    // );
     if (picked != null) {
-      _timeController.text = picked.format(context);
+      final hour = picked.hour.toString().padLeft(2, '0');
+      final minute = picked.minute.toString().padLeft(2, '0');
+      _timeController.text = '$hour:$minute';
     }
   }
 

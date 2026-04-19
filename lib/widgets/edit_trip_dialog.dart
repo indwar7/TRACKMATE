@@ -284,7 +284,7 @@ class _EditTripDialogState extends State<EditTripDialog> {
           style: const TextStyle(color: Colors.white, fontSize: 16),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
             prefixText: '₹ ',
             prefixStyle: const TextStyle(
               color: Color(0xFF00adb5),
@@ -292,14 +292,14 @@ class _EditTripDialogState extends State<EditTripDialog> {
               fontWeight: FontWeight.bold,
             ),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -345,10 +345,10 @@ class _EditTripDialogState extends State<EditTripDialog> {
                 return Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00adb5).withOpacity(0.1),
+                    color: const Color(0xFF00adb5).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color(0xFF00adb5).withOpacity(0.3),
+                      color: const Color(0xFF00adb5).withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(

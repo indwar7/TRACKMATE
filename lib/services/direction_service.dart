@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -8,7 +9,7 @@ class DirectionsService {
   Future<Map<String, dynamic>?> getDirections(
       String origin, String destination) async {
     if (apiKey == null) {
-      print('ERROR: directions_api_key not found in .env file');
+      debugPrint('ERROR: directions_api_key not found in .env file');
       return null;
     }
 
@@ -25,7 +26,7 @@ class DirectionsService {
         }
       }
     } catch (e) {
-      print('Error fetching directions: $e');
+      debugPrint('Error fetching directions: $e');
     }
     return null;
   }

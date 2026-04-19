@@ -29,11 +29,7 @@ class EnhancedTravelModeDetector {
   String _currentMode = 'Stationary';
   String _confidence = 'Low';
 
-  // For detecting stop-and-go patterns
-  int _consecutiveStops = 0;
-  int _consecutiveMoves = 0;
-  DateTime? _lastStopTime;
-  DateTime? _lastMoveTime;
+  // For detecting stop-and-go patterns (reserved for future use)
 
   // Statistical features
   double _speedMean = 0.0;
@@ -49,7 +45,6 @@ class EnhancedTravelModeDetector {
 
   // Movement continuity
   double _movementSmoothness = 0.0;
-  int _directionChanges = 0;
 
   /// Add speed sample with accuracy
   void addSpeedSample(double speedMs, double accuracy, {double? bearing}) {
@@ -185,7 +180,7 @@ class EnhancedTravelModeDetector {
     if (_speedSamples.length < 5) return;
 
     // Detect direction changes (for bearing data)
-    _directionChanges = 0;
+    int directionChanges = 0;
     for (int i = 2; i < _speedSamples.length; i++) {
       final prev = _speedSamples[i - 1].bearing;
       final curr = _speedSamples[i].bearing;
@@ -194,10 +189,13 @@ class EnhancedTravelModeDetector {
         final diff = (curr - prev).abs();
         // Significant direction change > 30 degrees
         if (diff > 30 && diff < 330) {
-          _directionChanges++;
+          directionChanges++;
         }
       }
     }
+    _movementSmoothness = directionChanges > 0
+        ? 1.0 / directionChanges
+        : 1.0;
 
     // Movement smoothness (inverse of speed coefficient of variation)
     if (_speedMean > 0) {

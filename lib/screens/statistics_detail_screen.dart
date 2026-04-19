@@ -400,13 +400,13 @@ class _StatisticsDetailScreenState extends State<StatisticsDetailScreen> {
                                                         begin: Alignment.bottomCenter,
                                                         end: Alignment.topCenter,
                                                         colors: [
-                                                          getBarColor(index).withOpacity(0.7),
+                                                          getBarColor(index).withValues(alpha: 0.7),
                                                           getBarColor(index),
                                                         ],
                                                       ),
                                                       boxShadow: [
                                                         BoxShadow(
-                                                          color: getBarColor(index).withOpacity(0.3),
+                                                          color: getBarColor(index).withValues(alpha: 0.3),
                                                           blurRadius: 8,
                                                           offset: const Offset(0, 2),
                                                         ),

@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 
-import 'package:google_fonts/google_fonts.dart';
-import 'package:get/get.dart';
-
 class TravelBookingScreen extends StatelessWidget {
-  const TravelBookingScreen({Key? key}) : super(key: key);
+  const TravelBookingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

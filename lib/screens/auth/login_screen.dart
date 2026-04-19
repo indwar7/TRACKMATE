@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trackmate_app/services/auth_service.dart';
 import 'package:trackmate_app/services/api_service.dart';
 
@@ -63,7 +61,6 @@ class _LoginScreenState extends State<LoginScreen> {
       hasMinLength && hasUpper && hasLower && hasDigit && hasSpecial;
 
   Future<void> loginUser() async {
-    // Clear previous errors
     setState(() {
       emailError = null;
       passwordError = null;
@@ -72,7 +69,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    // Validation
     if (email.isEmpty) {
       setState(() => emailError = "Email is required");
       return;
@@ -96,101 +92,32 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => isLoading = true);
 
     try {
-      debugPrint('🔐 Starting login request...');
-
       final response = await http.post(
-        Uri.parse("http://56.228.42.249/api/auth/login/"),
+        Uri.parse("http://13.60.63.106/api/auth/login/"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email, "password": password}),
-      ).timeout(
-        const Duration(seconds: 15),
-        onTimeout: () {
-          throw Exception('Request timeout');
-        },
-      );
-
-      debugPrint('📡 Login response status: ${response.statusCode}');
-      debugPrint('📦 Login response body: ${response.body}');
+      ).timeout(const Duration(seconds: 15), onTimeout: () {
+        throw Exception('Request timeout');
+      });
 
       setState(() => isLoading = false);
 
       if (response.statusCode == 200) {
-        // Parse response
         final data = jsonDecode(response.body);
 
-        debugPrint('✅ Login successful - parsing token...');
-
-        // Extract token from data["access"] or data["data"]["access"]
-        String? token;
-        if (data is Map<String, dynamic>) {
-          if (data.containsKey("data") && data["data"] is Map<String, dynamic>) {
-            // Token is nested in data["data"]["access"]
-            token = data["data"]["access"];
-          } else {
-            // Token is directly in data["access"]
-            token = data["access"];
-          }
-        }
+        final token = data['access'] as String?;
+        final refresh = data['refresh'] as String?;
 
         if (token == null || token.isEmpty) {
-          debugPrint('❌ No access token found in response!');
-          throw Exception('Server did not return authentication token');
+          throw Exception('No token in response');
         }
 
-        debugPrint('🔑 Token received: ${token.substring(0, 20)}...');
+        // Sync into ApiService and persist via AuthService
+        final apiService = Get.find<ApiService>();
+        apiService.accessToken = token;
+        apiService.refreshToken = refresh;
+        await Get.find<AuthService>().login(email, token);
 
-        // Save token to SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        final saved = await prefs.setString("access_token", token);
-        await prefs.setString("email", email);
-        await prefs.setBool("isLoggedIn", true);
-
-        debugPrint('💾 Token saved to SharedPreferences: $saved');
-        
-        // Verify token was saved
-        final savedToken = prefs.getString("access_token");
-        if (savedToken == null || savedToken.isEmpty) {
-          debugPrint('❌ CRITICAL: Token verification failed!');
-          throw Exception('Failed to save authentication token');
-        }
-        debugPrint('✅ Token verified in storage: ${savedToken.substring(0, 20)}...');
-
-        // Update ApiService with token - set it directly first, then load from storage
-        try {
-          final apiService = Provider.of<ApiService>(context, listen: false);
-          
-          // IMPORTANT: Set token directly on the instance FIRST
-          apiService.accessToken = token;
-          debugPrint('✅ [Login] Token set directly on ApiService instance');
-          
-          // Also save to the saveTokens method to keep refresh token logic consistent
-          // But since we only have access token, just set it directly
-          
-          // Verify the token is actually set
-          if (apiService.accessToken == null || apiService.accessToken!.isEmpty) {
-            debugPrint('❌ [Login] Token not set on ApiService instance!');
-          } else {
-            debugPrint('✅ [Login] ApiService instance token confirmed: ${apiService.accessToken!.substring(0, 20)}...');
-          }
-          
-          // Also reload from SharedPreferences to ensure consistency
-          await apiService.loadTokens();
-          
-          // Final verification
-          final finalToken = apiService.accessToken;
-          debugPrint('✅ [Login] Final ApiService token: ${finalToken != null && finalToken.isNotEmpty ? finalToken.substring(0, 20) + "..." : "NULL"}');
-        } catch (e, stackTrace) {
-          debugPrint('⚠️ Could not update ApiService: $e');
-          debugPrint('Stack trace: $stackTrace');
-        }
-
-        // Update AuthService with token
-        final authService = Get.find<AuthService>();
-        await authService.login(email, token);
-
-        debugPrint('✅ AuthService updated');
-
-        // Show success message
         Get.snackbar(
           "Success",
           "Welcome back!",
@@ -200,12 +127,9 @@ class _LoginScreenState extends State<LoginScreen> {
           duration: const Duration(seconds: 2),
         );
 
-        // Navigate to home
         await Future.delayed(const Duration(milliseconds: 500));
         Get.offAllNamed('/home');
-
       } else if (response.statusCode == 401) {
-        debugPrint('❌ Login failed: Invalid credentials');
         Get.snackbar(
           "Login Failed",
           "Invalid email or password",
@@ -214,24 +138,24 @@ class _LoginScreenState extends State<LoginScreen> {
           snackPosition: SnackPosition.TOP,
         );
       } else {
-        debugPrint('❌ Login failed: ${response.statusCode}');
+        final body = jsonDecode(response.body);
+        final message = body['detail'] ?? body['message'] ?? 'Something went wrong. Please try again.';
         Get.snackbar(
           "Error",
-          "Something went wrong. Please try again.",
+          message,
           backgroundColor: Colors.red,
           colorText: Colors.white,
           snackPosition: SnackPosition.TOP,
         );
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       setState(() => isLoading = false);
-
-      debugPrint('❌ Login error: $e');
-      debugPrint('Stack trace: $stackTrace');
-
+      final msg = e.toString().contains('timeout')
+          ? 'Request timed out. Check your connection.'
+          : 'Unable to connect to server.';
       Get.snackbar(
         "Connection Error",
-        "Unable to connect to server. Check your internet connection.",
+        msg,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.TOP,
@@ -495,7 +419,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: isLoading ? null : loginUser,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF8B5CF6),
-                      disabledBackgroundColor: const Color(0xFF8B5CF6).withOpacity(0.6),
+                      disabledBackgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),

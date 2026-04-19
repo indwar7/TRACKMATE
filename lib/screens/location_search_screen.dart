@@ -52,7 +52,7 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
         }
       });
     } catch (e) {
-      print('Error searching places: $e');
+      debugPrint('Error searching places: $e');
     }
   }
 

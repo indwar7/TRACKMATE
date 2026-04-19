@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class InviteFriendsScreen extends StatelessWidget {
-  const InviteFriendsScreen({Key? key}) : super(key: key);
+  const InviteFriendsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

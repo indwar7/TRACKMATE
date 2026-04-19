@@ -4,14 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:trackmate_app/controllers/profile_controller.dart';
 import 'package:trackmate_app/controllers/language_controller.dart';
 import 'package:trackmate_app/services/api_service.dart';
-import 'package:trackmate_app/screens/onboarding/welcome_screen.dart';
-import 'package:trackmate_app/screens/user/trusted_contacts_screen.dart';
 import 'package:trackmate_app/screens/auth/login_screen.dart';
 import 'package:trackmate_app/screens/user/invite_friends_screen.dart';
-import 'package:trackmate_app/screens/tools/safety_tools_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +265,7 @@ class SettingsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: const Color(0xFF8B5CF6), size: 22),

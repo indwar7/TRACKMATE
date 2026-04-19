@@ -30,7 +30,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     setState(() => loading = true);
 
     final response = await http.post(
-      Uri.parse("http://56.228.42.249/api/auth/reset-password/"),
+      Uri.parse("http://13.60.63.106/api/auth/reset-password/"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "email": email,
